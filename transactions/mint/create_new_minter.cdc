@@ -5,9 +5,8 @@
 // Minter are granted allowance by the UUID.
 // If a new one is created, the UUID will be different and will not have the same allowance. 
 
-import FungibleToken from 0x{{.FungibleToken}}
-import FiatToken from 0x{{.FiatToken}}
-import OnChainMultiSig from 0x{{.OnChainMultiSig}}
+import "FungibleToken"
+import "FiatToken"
 
 transaction(minterAddr: Address, publicKeys: [String], pubKeyWeights: [UFix64], multiSigAlgos: [UInt8]) {
     prepare (minter: AuthAccount) {

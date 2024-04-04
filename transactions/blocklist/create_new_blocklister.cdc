@@ -5,8 +5,7 @@
 // Blocklister does not have capability to blocklist until granted by owner of BlocklistExecutor.
 // If a new one is created, the capability will be lost
 
-import FiatToken from 0x{{.FiatToken}}
-import OnChainMultiSig from 0x{{.OnChainMultiSig}}
+import "FiatToken"
 
 transaction(blocklisterAddr: Address, publicKeys: [String], pubKeyWeights: [UFix64], multiSigAlgos: [UInt8]) {
     prepare (blocklister: AuthAccount) {

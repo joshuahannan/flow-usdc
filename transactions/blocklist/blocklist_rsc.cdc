@@ -3,7 +3,7 @@
 // - if the blocklister does not have delegated capability given by the BlocklistExecutor
 // - if the resource has already been blocklisted
 
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 transaction(resourceId: UInt64) {
     prepare (blocklister: AuthAccount) {
