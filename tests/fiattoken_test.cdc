@@ -79,7 +79,7 @@ fun testMintTokens() {
 
     typ = Type<FungibleToken.Deposited>()
     events = Test.eventsOfType(typ)
-    // Test.assertEqual(1, events.length)
+    Test.assertEqual(1, events.length)
 
     let tokensDepositedEvent = events[0] as! FungibleToken.Deposited
     Test.assertEqual(250.0, tokensDepositedEvent.amount)
