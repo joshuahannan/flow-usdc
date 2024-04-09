@@ -1,24 +1,33 @@
-// This script mints token on FiatToken contract and deposits the minted amount to the receiver's Vault 
-// It will fail if minter does not have enough allowance, is blocklisted or contract is paused
+// This script mints token on FiatToken contract and deposits
+// the minted amount to the receiver's Vault
 
 import "FungibleToken"
 import "FiatToken"
 
-transaction (amount: UFix64, receiver: Address) {
-    let mintedVault: @FungibleToken.Vault;
+transaction(recipient: Address, amount: UFix64) {
 
-    prepare(minter: AuthAccount) {
-        let m = minter.borrow<&FiatToken.Minter>(from: FiatToken.MinterStoragePath) 
-            ?? panic ("no minter resource avaialble");
-        self.mintedVault <- m.mint(amount: amount)
+    /// Reference to the Example Token Minter Resource object
+    let tokenMinter: &FiatToken.MinterResource
+
+    /// Reference to the Fungible Token Receiver of the recipient
+    let tokenReceiver: &{FungibleToken.Receiver}
+
+    prepare(signer: auth(BorrowValue) &Account) {
+
+        // Borrow a reference to the admin object
+        self.tokenMinter = signer.storage.borrow<&FiatToken.MinterResource>(from: FiatToken.MinterStoragePath)
+            ?? panic("Signer is not the minter")
+    
+        self.tokenReceiver = getAccount(recipient).capabilities.borrow<&FiatToken.Vault>(FiatToken.VaultReceiverPubPath)
+            ?? panic("Could not borrow receiver reference to the Vault")
     }
 
     execute {
-        let recvAcct = getAccount(receiver);
-        let receiverRef = recvAcct.getCapability(FiatToken.VaultReceiverPubPath)
-            .borrow<&{FungibleToken.Receiver}>()
-            ?? panic("Could not borrow receiver reference to the recipient's Vault")
 
-        receiverRef.deposit(from: <-self.mintedVault)
+        // Create mint tokens
+        let mintedVault <- self.tokenMinter.mint(amount: amount)
+
+        // Deposit them to the receiever
+        self.tokenReceiver.deposit(from: <-mintedVault)
     }
 }

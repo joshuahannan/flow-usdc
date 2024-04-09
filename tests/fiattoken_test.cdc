@@ -2,6 +2,7 @@ import Test
 import BlockchainHelpers
 import "test_helpers.cdc"
 import "FungibleToken"
+import "FiatToken"
 
 access(all) let admin = Test.getAccount(0x0000000000000007)
 access(all) let recipient = Test.createAccount()
@@ -26,13 +27,13 @@ fun setup() {
             VaultStoragePath,
             VaultBalancePubPath,
             VaultReceiverPubPath,
-            BlocklisterStoragePath,
-            PauserStoragePath,
+            //BlocklisterStoragePath,
+            //PauserStoragePath,
             MinterStoragePath,
             tokenName,
             version,
-            initTotalSupply,
-            initPaused
+            initTotalSupply
+            //initPaused
         ]
     )
 }
@@ -49,74 +50,52 @@ fun testGetTotalSupply() {
     Test.assertEqual(1000000000.00000000, totalSupply)
 }
 
-// access(all)
-// fun testGetAdminBalance() {
-//     let scriptResult = executeScript(
-//         "../transactions/scripts/get_balance.cdc",
-//         [admin.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
+access(all)
+fun testSetupAccount() {
+    let txResult = executeTransaction(
+        "../transactions/vault/create_vault.cdc",
+        [],
+        recipient
+    )
+    Test.expect(txResult, Test.beSucceeded())
+}
 
-//     let balance = scriptResult.returnValue! as! UFix64
-//     Test.assertEqual(1000.0, balance)
-// }
+access(all)
+fun testMintTokens() {
+    let txResult = executeTransaction(
+        "../transactions/mint/mint.cdc",
+        [recipient.address, 250.0],
+        admin
+    )
+    Test.expect(txResult, Test.beSucceeded())
 
-// access(all)
-// fun testSetupAccount() {
-//     let txResult = executeTransaction(
-//         "../transactions/setup_account.cdc",
-//         [],
-//         recipient
-//     )
-//     Test.expect(txResult, Test.beSucceeded())
+    // Test that the proper events were emitted
+    var typ = Type<FiatToken.Mint>()
+    var events = Test.eventsOfType(typ)
+    Test.assertEqual(1, events.length)
 
-//     // Test that the newly-setup account has a balance of 0.0
-//     let scriptResult = executeScript(
-//         "../transactions/scripts/get_balance.cdc",
-//         [recipient.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
+    let tokensMintedEvent = events[0] as! FiatToken.Mint
+    Test.assertEqual(250.0, tokensMintedEvent.amount)
 
-//     let balance = scriptResult.returnValue! as! UFix64
-//     Test.assertEqual(0.0, balance)
-// }
+    typ = Type<FungibleToken.Deposited>()
+    events = Test.eventsOfType(typ)
+    // Test.assertEqual(1, events.length)
 
-// access(all)
-// fun testMintTokens() {
-//     let txResult = executeTransaction(
-//         "../transactions/mint_tokens.cdc",
-//         [recipient.address, 250.0],
-//         admin
-//     )
-//     Test.expect(txResult, Test.beSucceeded())
+    let tokensDepositedEvent = events[0] as! FungibleToken.Deposited
+    Test.assertEqual(250.0, tokensDepositedEvent.amount)
+    Test.assertEqual(recipient.address, tokensDepositedEvent.to!)
+    Test.assertEqual("A.0000000000000007.FiatToken.Vault", tokensDepositedEvent.type)
 
-//     // Test that the proper events were emitted
-//     // var typ = Type<ExampleToken.TokensMinted>()
-//     // var events = Test.eventsOfType(typ)
-//     // Test.assertEqual(1, events.length)
+    // Test that the totalSupply increased by the amount of minted tokens
+    let scriptResult = executeScript(
+        "../transactions/scripts/get_supply.cdc",
+        []
+    )
+    Test.expect(scriptResult, Test.beSucceeded())
 
-//     // let tokensMintedEvent = events[0] as! ExampleToken.TokensMinted
-//     // Test.assertEqual(250.0, tokensMintedEvent.amount)
-
-//     var typ = Type<FungibleToken.Deposited>()
-//     var events = Test.eventsOfType(typ)
-//     Test.assertEqual(1, events.length)
-
-//     let tokensDepositedEvent = events[0] as! FungibleToken.Deposited
-//     Test.assertEqual(250.0, tokensDepositedEvent.amount)
-//     Test.assertEqual(recipient.address, tokensDepositedEvent.to!)
-//     Test.assertEqual("A.0000000000000007.ExampleToken.Vault", tokensDepositedEvent.type)
-
-//     // Test that the totalSupply increased by the amount of minted tokens
-//     let scriptResult = executeScript(
-//         "../transactions/scripts/get_supply.cdc",
-//         []
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
-
-//     let totalSupply = scriptResult.returnValue! as! UFix64
-//     Test.assertEqual(1250.0, totalSupply)
-// }
+    let totalSupply = scriptResult.returnValue! as! UFix64
+    Test.assertEqual(1000000250.0, totalSupply)
+}
 
 // access(all)
 // fun testTransferTokens() {
