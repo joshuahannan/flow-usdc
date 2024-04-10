@@ -16,7 +16,7 @@ transaction(amount: UFix64, to: Address) {
     prepare(signer: auth(Storage, BorrowValue, Capabilities, AddContract) &Account) {
 
         // Get a reference to the signer's stored vault
-        let vaultRef = signer.borrow<&FiatToken.Vault>(from: FiatToken.VaultStoragePath)
+        let vaultRef = signer.storage.borrow<auth(FungibleToken.Withdraw) &FiatToken.Vault>(from: FiatToken.VaultStoragePath)
             ?? panic("Could not borrow reference to the owner's Vault!")
 
         // Withdraw tokens from the signer's stored vault

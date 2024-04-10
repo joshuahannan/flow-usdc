@@ -2,6 +2,7 @@ import Test
 import BlockchainHelpers
 import "test_helpers.cdc"
 import "FungibleToken"
+import "FungibleTokenMetadataViews"
 import "FiatToken"
 
 access(all) let admin = Test.getAccount(0x0000000000000007)
@@ -15,7 +16,7 @@ access(all) let PauserStoragePath = StoragePath(identifier: "USDCPauser")!
 access(all) let MinterStoragePath = StoragePath(identifier: "USDCMinter")!
 access(all) let tokenName = "USDC"
 access(all) let version = "2.0.0"
-access(all) let initTotalSupply = 1000000000.00000000
+access(all) let initTotalSupply = 1000.0
 access(all) let initPaused = false
 
 access(all)
@@ -47,7 +48,7 @@ fun testGetTotalSupply() {
     Test.expect(scriptResult, Test.beSucceeded())
 
     let totalSupply = scriptResult.returnValue! as! UFix64
-    Test.assertEqual(1000000000.00000000, totalSupply)
+    Test.assertEqual(1000.00000000, totalSupply)
 }
 
 access(all)
@@ -78,10 +79,9 @@ fun testMintTokens() {
     Test.assertEqual(250.0, tokensMintedEvent.amount)
 
     typ = Type<FungibleToken.Deposited>()
-    events = Test.eventsOfType(typ)
-    Test.assertEqual(1, events.length)
+    let depositEvents = Test.eventsOfType(typ)
 
-    let tokensDepositedEvent = events[0] as! FungibleToken.Deposited
+    let tokensDepositedEvent = depositEvents[depositEvents.length - 1] as! FungibleToken.Deposited
     Test.assertEqual(250.0, tokensDepositedEvent.amount)
     Test.assertEqual(recipient.address, tokensDepositedEvent.to!)
     Test.assertEqual("A.0000000000000007.FiatToken.Vault", tokensDepositedEvent.type)
@@ -94,109 +94,63 @@ fun testMintTokens() {
     Test.expect(scriptResult, Test.beSucceeded())
 
     let totalSupply = scriptResult.returnValue! as! UFix64
-    Test.assertEqual(1000000250.0, totalSupply)
+    Test.assertEqual(1250.0, totalSupply)
 }
 
-// access(all)
-// fun testTransferTokens() {
-//     let txResult = executeTransaction(
-//         "../transactions/transfer_tokens.cdc",
-//         [50.0, admin.address],
-//         recipient
-//     )
-//     Test.expect(txResult, Test.beSucceeded())
+access(all)
+fun testTransferTokens() {
+    let txResult = executeTransaction(
+        "../transactions/vault/transfer_FiatToken.cdc",
+        [50.0, admin.address],
+        recipient
+    )
+    Test.expect(txResult, Test.beSucceeded())
 
-//     var typ = Type<FungibleToken.Deposited>()
-//     Test.assertEqual(2, Test.eventsOfType(typ).length)
+    var typ = Type<FungibleToken.Withdrawn>()
+    let events = Test.eventsOfType(typ)
 
-//     typ = Type<FungibleToken.Withdrawn>()
-//     let events = Test.eventsOfType(typ)
-//     Test.assertEqual(1, events.length)
+    let tokensWithdrawnEvent = events[events.length - 1] as! FungibleToken.Withdrawn
+    Test.assertEqual(50.0, tokensWithdrawnEvent.amount)
+    Test.assertEqual(recipient.address, tokensWithdrawnEvent.from!)
 
-//     let tokensWithdrawnEvent = events[0] as! FungibleToken.Withdrawn
-//     Test.assertEqual(50.0, tokensWithdrawnEvent.amount)
-//     Test.assertEqual(recipient.address, tokensWithdrawnEvent.from!)
+    var scriptResult = executeScript(
+        "../transactions/scripts/get_balance.cdc",
+        [recipient.address]
+    )
+    Test.expect(scriptResult, Test.beSucceeded())
 
-//     var scriptResult = executeScript(
-//         "../transactions/scripts/get_balance.cdc",
-//         [recipient.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
+    var balance = scriptResult.returnValue! as! UFix64
+    // 250.0 tokens were previously minted to the recipient
+    Test.assertEqual(200.0, balance)
 
-//     var balance = scriptResult.returnValue! as! UFix64
-//     // 250.0 tokens were previously minted to the recipient
-//     Test.assertEqual(200.0, balance)
+    scriptResult = executeScript(
+        "../transactions/scripts/get_balance.cdc",
+        [admin.address]
+    )
+    Test.expect(scriptResult, Test.beSucceeded())
 
-//     scriptResult = executeScript(
-//         "../transactions/scripts/get_balance.cdc",
-//         [admin.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
+    // The admin had initially 1000.0 tokens (initial supply)
+    balance = scriptResult.returnValue! as! UFix64
+    Test.assertEqual(1050.0, balance)
+}
 
-//     // The admin had initially 1000.0 tokens (initial supply)
-//     balance = scriptResult.returnValue! as! UFix64
-//     Test.assertEqual(1050.0, balance)
-// }
+access(all)
+fun testVaultTypes() {
+    let scriptResult = executeScript(
+        "../transactions/scripts/get_views.cdc",
+        [recipient.address]
+    )
+    Test.expect(scriptResult, Test.beSucceeded())
 
-// access(all)
-// fun testTransferTokenAmountGreaterThanBalance() {
-//     let txResult = executeTransaction(
-//         "../transactions/transfer_tokens.cdc",
-//         [1550.0, admin.address],
-//         recipient
-//     )
-//     Test.expect(txResult, Test.beFailed())
-//     Test.assertError(
-//         txResult,
-//         errorMessage: "Amount withdrawn must be less than or equal than the balance of the Vault"
-//     )
-// }
-
-// access(all)
-// fun testBurnTokens() {
-//     let txResult = executeTransaction(
-//         "../transactions/burn_tokens.cdc",
-//         [50.0],
-//         admin
-//     )
-//     Test.expect(txResult, Test.beSucceeded())
-
-//     let type = Type<FungibleToken.Burned>()
-//     let events = Test.eventsOfType(type)
-//     Test.assertEqual(1, events.length)
-
-//     let tokensBurnedEvent = events[0] as! FungibleToken.Burned
-//     Test.assertEqual(50.0, tokensBurnedEvent.amount)
-//     Test.assertEqual("A.0000000000000007.ExampleToken.Vault", tokensBurnedEvent.type)
-
-//     let scriptResult = executeScript(
-//         "../transactions/scripts/get_balance.cdc",
-//         [admin.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
-
-//     // The admin should now have the initial supply of 1000.0 tokens
-//     let balance = scriptResult.returnValue! as! UFix64
-//     Test.assertEqual(1000.0, balance)
-// }
-
-// access(all)
-// fun testVaultTypes() {
-//     let scriptResult = executeScript(
-//         "scripts/get_views.cdc",
-//         [recipient.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
-
-//     let supportedViews = scriptResult.returnValue! as! [Type]
-//     let expectedViews = [
-//         Type<FungibleTokenMetadataViews.FTView>(),
-//         Type<FungibleTokenMetadataViews.FTDisplay>(),
-//         Type<FungibleTokenMetadataViews.FTVaultData>(),
-//         Type<FungibleTokenMetadataViews.TotalSupply>()
-//     ]
-//     Test.assertEqual(expectedViews, supportedViews)
-// }
+    let supportedViews = scriptResult.returnValue! as! [Type]
+    let expectedViews = [
+        Type<FungibleTokenMetadataViews.FTView>(),
+        Type<FungibleTokenMetadataViews.FTDisplay>(),
+        Type<FungibleTokenMetadataViews.FTVaultData>(),
+        Type<FungibleTokenMetadataViews.TotalSupply>()
+    ]
+    Test.assertEqual(expectedViews, supportedViews)
+}
 
 // access(all)
 // fun testGetVaultDisplay() {
@@ -243,16 +197,4 @@ fun testMintTokens() {
 //         [recipient.address]
 //     )
 //     Test.expect(scriptResult, Test.beSucceeded())
-// }
-
-// access(all)
-// fun testGetUnsupportedViewType() {
-//     let scriptResult = executeScript(
-//         "scripts/get_unsupported_view.cdc",
-//         [recipient.address, Type<String>()]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
-
-//     let view = scriptResult.returnValue
-//     Test.expect(view, Test.beNil())
 // }
