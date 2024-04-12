@@ -31,6 +31,9 @@ access(all) contract FiatToken: FungibleToken {
     // The token total supply
     access(all) var totalSupply: UFix64
 
+    // Blocked resources dictionary {resourceId: Block Height}
+    access(contract) let blocklist: {UInt64: UInt64}
+
     // -------- ViewResolver Functions for MetadataViews --------
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
@@ -156,11 +159,18 @@ access(all) contract FiatToken: FungibleToken {
         }
 
         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+            pre {
+                FiatToken.blocklist[self.uuid] == nil: "Vault Blocklisted"
+            }
             self.balance = self.balance - amount
             return <-create Vault(balance: amount)
         }
 
         access(all) fun deposit(from: @{FungibleToken.Vault}) {
+            pre {
+                FiatToken.blocklist[from.uuid] == nil: "Receiving Vault Blocklisted"
+                FiatToken.blocklist[self.uuid] == nil: "Vault Blocklisted"
+            }
             let vault <- from as! @FiatToken.Vault
             self.balance = self.balance + vault.balance
             vault.balance = 0.0
@@ -179,6 +189,9 @@ access(all) contract FiatToken: FungibleToken {
     access(all) resource MinterResource {
 
         access(all) fun mint(amount: UFix64): @{FungibleToken.Vault} {
+            pre {
+                FiatToken.blocklist[self.uuid] == nil: "Minter Blocklisted"
+            }
             let newTotalSupply = FiatToken.totalSupply + amount
             FiatToken.totalSupply = newTotalSupply
 
@@ -220,6 +233,7 @@ access(all) contract FiatToken: FungibleToken {
         self.name = tokenName
         self.version = version
         self.totalSupply = initTotalSupply
+        self.blocklist = {}
 
         self.VaultStoragePath = VaultStoragePath
         self.VaultBalancePubPath = VaultBalancePubPath
