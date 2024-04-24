@@ -211,6 +211,12 @@ access(all) contract FiatToken: FungibleToken {
         }
     }
 
+    /// Another contract will be deployed that can call this to
+    /// create the minter resource and send it to the bridge account
+    access(account) fun createMinter(): @MinterResource {
+        return <-create MinterResource()
+    }
+
     // ------- FiatToken functions -------
 
     access(all) fun createEmptyVault(vaultType: Type): @Vault {
@@ -252,7 +258,6 @@ access(all) contract FiatToken: FungibleToken {
         // Create public capabilities to the vault
         let tokenCap = self.account.capabilities.storage.issue<&FiatToken.Vault>(self.VaultStoragePath)
         self.account.capabilities.publish(tokenCap, at: self.VaultReceiverPubPath)
-        let receiverCap = self.account.capabilities.storage.issue<&FiatToken.Vault>(self.VaultStoragePath)
-        self.account.capabilities.publish(receiverCap, at: self.VaultBalancePubPath)
+        self.account.capabilities.publish(tokenCap, at: self.VaultBalancePubPath)
     }
 }
