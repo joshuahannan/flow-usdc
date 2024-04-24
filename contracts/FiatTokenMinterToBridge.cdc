@@ -24,6 +24,7 @@ access(all) contract FiatTokenMinterToBridge {
     init() {
         // Create a MinterSender resource
         let minterSender <- create MinterSender()
+        // Store it in the contract account
         self.account.storage.save(<-minterSender, to: /storage/fiatTokenMinterSender)
     }
 }

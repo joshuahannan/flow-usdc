@@ -65,6 +65,12 @@
         "testnet": "0xa983fecbed621163",
         "mainnet": "0xb19436aae4d94622"
       }
+    },
+    "FlowEVMBridgeHandlerInterfaces": {
+      "source": "./contracts/utility/FlowEVMBridgeHandlerInterfaces.cdc",
+      "aliases": {
+        "testing": "0x0000000000000007"
+      }
     }
   },
   "accounts": {

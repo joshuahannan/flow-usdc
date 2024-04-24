@@ -22,6 +22,11 @@ access(all) let initPaused = false
 access(all)
 fun setup() {
     deployWithArgs(
+        "FlowEVMBridgeHandlerInterfaces",
+        "../contracts/utility/FlowEVMBridgeHandlerInterfaces.cdc",
+        args: []
+    )
+    deployWithArgs(
         "FiatToken",
         "../contracts/FiatToken.cdc",
         args: [

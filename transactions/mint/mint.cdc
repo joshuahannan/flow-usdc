@@ -3,11 +3,12 @@
 
 import "FungibleToken"
 import "FiatToken"
+import "FlowEVMBridgeHandlerInterfaces"
 
 transaction(recipient: Address, amount: UFix64) {
 
     /// Reference to the Example Token Minter Resource object
-    let tokenMinter: &FiatToken.MinterResource
+    let tokenMinter: auth(FlowEVMBridgeHandlerInterfaces.Mint) &FiatToken.MinterResource
 
     /// Reference to the Fungible Token Receiver of the recipient
     let tokenReceiver: &{FungibleToken.Receiver}
@@ -15,7 +16,7 @@ transaction(recipient: Address, amount: UFix64) {
     prepare(signer: auth(BorrowValue) &Account) {
 
         // Borrow a reference to the admin object
-        self.tokenMinter = signer.storage.borrow<&FiatToken.MinterResource>(from: FiatToken.MinterStoragePath)
+        self.tokenMinter = signer.storage.borrow<auth(FlowEVMBridgeHandlerInterfaces.Mint) &FiatToken.MinterResource>(from: FiatToken.MinterStoragePath)
             ?? panic("Signer is not the minter")
     
         self.tokenReceiver = getAccount(recipient).capabilities.borrow<&FiatToken.Vault>(FiatToken.VaultReceiverPubPath)

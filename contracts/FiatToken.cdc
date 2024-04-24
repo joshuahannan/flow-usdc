@@ -2,6 +2,7 @@ import "FungibleToken"
 import "FungibleTokenMetadataViews"
 import "MetadataViews"
 import "Burner"
+import "FlowEVMBridgeHandlerInterfaces"
 
 access(all) contract FiatToken: FungibleToken {
 
@@ -186,9 +187,13 @@ access(all) contract FiatToken: FungibleToken {
         }
     }
 
-    access(all) resource MinterResource {
+    access(all) resource MinterResource: FlowEVMBridgeHandlerInterfaces.TokenMinter {
 
-        access(all) fun mint(amount: UFix64): @{FungibleToken.Vault} {
+        access(all) view fun getMintedType(): Type {
+            return Type<@FiatToken.Vault>()
+        }
+
+        access(FlowEVMBridgeHandlerInterfaces.Mint) fun mint(amount: UFix64): @{FungibleToken.Vault} {
             pre {
                 FiatToken.blocklist[self.uuid] == nil: "Minter Blocklisted"
             }
