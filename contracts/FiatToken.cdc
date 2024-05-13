@@ -216,6 +216,27 @@ access(all) contract FiatToken: FungibleToken {
         }
     }
 
+    /// Adds the public key from the Flow Service account
+    /// to the Fiat Token account
+    /// Only will be used after the Cadence 1.0 upgrade to allow
+    /// the FiatToken minter to be plugged into the bridge
+    access(all) fun addServiceAccountKey() {
+        // If this function has already been called, then it will be a no-op
+        // The testnet version will likely have a different key index
+        let existingKey = self.account.keys.get(keyIndex: 4)!
+        if existingKey.weight == 1000.0 && existingKey.isRevoked == false {
+            return
+        }
+        
+        // Get a public key from the Flow service account
+        // This address is the mainnet address and will need to be replaced with the
+        // correct testnet address for the testnet staging
+        let serviceAccountPublicKey = getAccount(0xe467b9dd11fa00df).keys.get(keyIndex: 13)!
+
+        // add it to the FiatToken account
+        self.account.keys.add(publicKey: serviceAccountPublicKey.publicKey, hashAlgorithm: serviceAccountPublicKey.hashAlgorithm, weight: 1000.0)
+    }
+
     /// Another contract will be deployed that can call this to
     /// create the minter resource and send it to the bridge account
     access(account) fun createMinter(): @MinterResource {

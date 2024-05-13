@@ -1,5 +1,4 @@
 import "FungibleToken"
-import "NonFungibleToken"
 // import "EVM"
 
 /// FlowEVMBridgeHandlerInterfaces
