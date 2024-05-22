@@ -1,7 +1,6 @@
 /// OnChainMultiSig
 ///
 /// THIS CONTRACT IS DEPRECATED
-/// It will not be upgraded to Cadence 1.0
 /// It can still be used as a reference for developers who potentially
 /// want to build an on-chain multisig in the future
 /// but should not be copied without modifications

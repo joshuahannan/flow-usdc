@@ -26,6 +26,13 @@ fun setup() {
         "../contracts/utility/FlowEVMBridgeHandlerInterfaces.cdc",
         args: []
     )
+
+    deployWithArgs(
+        "OnChainMultiSig",
+        "../contracts/OnChainMultiSig.cdc",
+        args: []
+    )
+
     deployWithArgs(
         "FiatToken",
         "../contracts/FiatToken.cdc",

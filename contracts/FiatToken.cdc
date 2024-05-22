@@ -2,6 +2,7 @@ import "FungibleToken"
 import "FungibleTokenMetadataViews"
 import "MetadataViews"
 import "Burner"
+import "OnChainMultiSig"
 import "FlowEVMBridgeHandlerInterfaces"
 
 access(all) contract FiatToken: FungibleToken {
@@ -100,17 +101,17 @@ access(all) contract FiatToken: FungibleToken {
 
     // ------- Old FiatToken Resources, kept for backwards compatibility, but all functionality has been removed
     access(all) resource AdminExecutor {}
-    access(all) resource Admin: ResourceId, AdminCapReceiver {}
+    access(all) resource Admin: OnChainMultiSig.PublicSigner, ResourceId, AdminCapReceiver {}
     access(all) resource OwnerExecutor {}
-    access(all) resource Owner: ResourceId, OwnerCapReceiver {}
+    access(all) resource Owner: OnChainMultiSig.PublicSigner, ResourceId, OwnerCapReceiver {}
     access(all) resource MasterMinterExecutor {}
-    access(all) resource MasterMinter: ResourceId, MasterMinterCapReceiver {}
-    access(all) resource MinterController: ResourceId {}
+    access(all) resource MasterMinter: OnChainMultiSig.PublicSigner, ResourceId, MasterMinterCapReceiver {}
+    access(all) resource MinterController: OnChainMultiSig.PublicSigner, ResourceId {}
     access(all) resource Minter: ResourceId {}
     access(all) resource BlocklistExecutor {}
-    access(all) resource Blocklister: ResourceId, BlocklisterCapReceiver {}
+    access(all) resource Blocklister: OnChainMultiSig.PublicSigner, ResourceId, BlocklisterCapReceiver {}
     access(all) resource PauseExecutor {}
-    access(all) resource Pauser: ResourceId, PauseCapReceiver {}
+    access(all) resource Pauser: OnChainMultiSig.PublicSigner, ResourceId, PauseCapReceiver {}
 
     // ------- FiatToken Resources -------
 
