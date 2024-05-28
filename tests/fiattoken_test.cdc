@@ -28,12 +28,6 @@ fun setup() {
     )
 
     deployWithArgs(
-        "OnChainMultiSig",
-        "../contracts/OnChainMultiSig.cdc",
-        args: []
-    )
-
-    deployWithArgs(
         "FiatToken",
         "../contracts/FiatToken.cdc",
         args: [

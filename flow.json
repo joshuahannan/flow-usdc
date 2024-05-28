@@ -65,14 +65,6 @@
         "mainnet": "0xb19436aae4d94622"
       }
     },
-    "OnChainMultiSig": {
-      "source": "./contracts/OnChainMultiSig.cdc",
-      "aliases": {
-        "testing": "0x0000000000000007",
-        "testnet": "0x5a5b0a73a29e83f1",
-        "mainnet": "0x220c1b4155f86f2f"
-      }
-    },
     "FlowEVMBridgeHandlerInterfaces": {
       "source": "./contracts/utility/FlowEVMBridgeHandlerInterfaces.cdc",
       "aliases": {
