@@ -219,46 +219,60 @@ access(all) contract FiatToken: FungibleToken {
         var existingServiceAccountKeyIndex = 0
         
         // Get a public key from the Flow service account
+        // The addresses and key indicies are hardcoded here because there is no way
+        // to directly get the address from a deployed service account contract
+        // You can verify that they are correct by looking at the 
+        // Flow documentation: https://developers.flow.com/build/core-contracts/service-account
+        // OR
+        // Flowview: https://www.flowview.app/
 
         if self.account.address == 0xb19436aae4d94622 {
             // This is the mainnet version and needs to get
             // the key from the mainnet service account
             serviceAddress = 0xe467b9dd11fa00df
+
+            // 13 is the index of one of the Flow controlled keys on mainnet
             existingServiceAccountKeyIndex = 13
 
             // On mainnet, the new FiatToken account key index will be 4
+            // because there are currently four slots already taken
+            // by old keys
             newServiceKeyIndex = 4
         } else if self.account.address == 0xa983fecbed621163 {
             // This is the testnet version and needs to get
             // the key from the testnet service account
             serviceAddress = 0x8c5303eaa26202d6
+
+            // All three service account keys on testnet are the same
+            // so using index zero will work
             existingServiceAccountKeyIndex = 0
 
             // On testnet, the new FiatToken account key index will be 4
+            // same reasoning as testnet
             newServiceKeyIndex = 4
         } else {
             // This is the testing framework and we need to get the service account key
             // from the testing framework service account
             serviceAddress = 0x0000000000000001
+
+            // The testing framework service account always starts with one key at index zero
             existingServiceAccountKeyIndex = 0
 
             // On emulator, the new FiatToken account key index will be 1
+            // because it is the second key
             newServiceKeyIndex = 1
         }
 
-        // If this function has already been called, then it will be a no-op
-        // The testnet and mainet versions have the same key index
-        // We use keyIndex 4 because both the testnet and mainnet FiatToken accounts
-        // have the first four indicies (0, 1, 2, and 3) already taken up by keys
+        // Check to see if the new key has already been added or not
+        // If it has already been added, revert
         let existingKey = self.account.keys.get(keyIndex: newServiceKeyIndex)
-
         if let key = existingKey {
             if key.weight == 1000.0 && key.isRevoked == false {
                 panic("The service key has already been added to the FiatToken account")
             }
         }
 
-        // Get the public key
+        // Get the public key from the service account
         let serviceAccountPublicKey = getAccount(serviceAddress!).keys.get(keyIndex: existingServiceAccountKeyIndex)
             ?? panic("Could not get the service account public key")
 
