@@ -92,11 +92,6 @@ access(all) contract FiatToken: FungibleToken {
 
     // ------- Old FiatToken Interfaces, kept for backwards compatibility, but all functionality has been removed
     access(all) resource interface ResourceId {}
-    access(all) resource interface AdminCapReceiver {}
-    access(all) resource interface OwnerCapReceiver {}
-    access(all) resource interface MasterMinterCapReceiver {}
-    access(all) resource interface BlocklisterCapReceiver {}
-    access(all) resource interface PauseCapReceiver {}
 
     // ------- FiatToken Resources -------
 
