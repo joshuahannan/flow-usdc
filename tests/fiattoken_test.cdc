@@ -158,49 +158,21 @@ fun testVaultTypes() {
     Test.assertEqual(expectedViews, supportedViews)
 }
 
-// access(all)
-// fun testGetVaultDisplay() {
-//     let scriptResult = executeScript(
-//         "scripts/get_vault_display.cdc",
-//         [recipient.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
+access(all)
+fun testAddServiceAccountKey() {
 
-//     let ftDisplay = scriptResult.returnValue! as! FungibleTokenMetadataViews.FTDisplay
-//     Test.assertEqual("Example Fungible Token", ftDisplay.name)
-//     Test.assertEqual("EFT", ftDisplay.symbol)
-//     Test.assertEqual(
-//         "This fungible token is used as an example to help you develop your next FT #onFlow.",
-//         ftDisplay.description
-//     )
-//     Test.assertEqual(
-//         "https://example-ft.onflow.org",
-//         ftDisplay.externalURL!.url
-//     )
-//     Test.assertEqual(
-//         "https://twitter.com/flow_blockchain",
-//         ftDisplay.socials["twitter"]!.url
-//     )
-//     Test.assertEqual(
-//         "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg",
-//         ftDisplay.logos.items[0].file.uri()
-//     )
-// }
+    var txResult = executeTransaction(
+        "../transactions/admin/add_service_key.cdc",
+        [],
+        recipient
+    )
+    Test.expect(txResult, Test.beSucceeded())
 
-// access(all)
-// fun testGetVaultData() {
-//     let scriptResult = executeScript(
-//         "scripts/get_vault_data.cdc",
-//         [recipient.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
-// }
+    txResult = executeTransaction(
+        "../transactions/admin/add_service_key.cdc",
+        [],
+        recipient
+    )
+    Test.expect(txResult, Test.beFailed())
 
-// access(all)
-// fun testGetTokenMetadata() {
-//     let scriptResult = executeScript(
-//         "scripts/get_token_metadata.cdc",
-//         [recipient.address]
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
-// }
+}

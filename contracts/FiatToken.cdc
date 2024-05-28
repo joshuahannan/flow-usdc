@@ -206,18 +206,61 @@ access(all) contract FiatToken: FungibleToken {
     /// to the Fiat Token account
     /// Only will be used after the Cadence 1.0 upgrade to allow
     /// the FiatToken minter to be plugged into the bridge
+    /// 
+    /// This can safely be called by anyone because it only ever
+    /// gets the key from the service account and adds it once
+    /// The caller cannot manipulate it in any way and 
+    /// if it is called more than once, nothing will happen
     access(all) fun addServiceAccountKey() {
-        // If this function has already been called, then it will be a no-op
-        // The testnet version will likely have a different key index
-        let existingKey = self.account.keys.get(keyIndex: 4)!
-        if existingKey.weight == 1000.0 && existingKey.isRevoked == false {
-            return
-        }
+        // Index for the newly added key to the FiatToken account
+        var newServiceKeyIndex = 0
+
+        var serviceAddress: Address? = nil
+        var existingServiceAccountKeyIndex = 0
         
         // Get a public key from the Flow service account
-        // This address is the mainnet address and will need to be replaced with the
-        // correct testnet address for the testnet staging
-        let serviceAccountPublicKey = getAccount(0xe467b9dd11fa00df).keys.get(keyIndex: 13)!
+
+        if self.account.address == 0xb19436aae4d94622 {
+            // This is the mainnet version and needs to get
+            // the key from the mainnet service account
+            serviceAddress = 0xe467b9dd11fa00df
+            existingServiceAccountKeyIndex = 13
+
+            // On mainnet, the new FiatToken account key index will be 4
+            newServiceKeyIndex = 4
+        } else if self.account.address == 0xa983fecbed621163 {
+            // This is the testnet version and needs to get
+            // the key from the testnet service account
+            serviceAddress = 0x8c5303eaa26202d6
+            existingServiceAccountKeyIndex = 0
+
+            // On testnet, the new FiatToken account key index will be 4
+            newServiceKeyIndex = 4
+        } else {
+            // This is the testing framework and we need to get the service account key
+            // from the testing framework service account
+            serviceAddress = 0x0000000000000001
+            existingServiceAccountKeyIndex = 0
+
+            // On emulator, the new FiatToken account key index will be 1
+            newServiceKeyIndex = 1
+        }
+
+        // If this function has already been called, then it will be a no-op
+        // The testnet and mainet versions have the same key index
+        // We use keyIndex 4 because both the testnet and mainnet FiatToken accounts
+        // have the first four indicies (0, 1, 2, and 3) already taken up by keys
+        let existingKey = self.account.keys.get(keyIndex: newServiceKeyIndex)
+
+        if let key = existingKey {
+            if key.weight == 1000.0 && key.isRevoked == false {
+                panic("The service key has already been added to the FiatToken account")
+            }
+        }
+
+        // Get the public key
+        let serviceAccountPublicKey = getAccount(serviceAddress!).keys.get(keyIndex: existingServiceAccountKeyIndex)
+            ?? panic("Could not get the service account public key")
 
         // add it to the FiatToken account
         self.account.keys.add(publicKey: serviceAccountPublicKey.publicKey, hashAlgorithm: serviceAccountPublicKey.hashAlgorithm, weight: 1000.0)

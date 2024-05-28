@@ -70,6 +70,14 @@
       "aliases": {
         "testing": "0x0000000000000007"
       }
+    },
+    "FlowServiceAccount": {
+      "aliases": {
+        "testing": "0x0000000000000001",
+        "emulator": "0xf8d6e0586b0a20c7",
+        "testnet": "0x8c5303eaa26202d6",
+        "mainnet": "0xe467b9dd11fa00df"
+      }
     }
   },
   "accounts": {
