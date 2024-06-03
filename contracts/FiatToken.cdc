@@ -9,15 +9,17 @@ access(all) contract FiatToken: FungibleToken {
     // ------- FiatToken Events -------
     
     // FiatToken.Vault events
+
     access(all) event NewVault(resourceId: UInt64)
     access(all) event DestroyVault(resourceId: UInt64)
 
     // Minting events
+
     access(all) event MinterCreated(resourceId: UInt64)
     access(all) event Mint(minter: UInt64, amount: UFix64)
     access(all) event Burn(minter: UInt64, amount: UFix64)
 
-    // ------- FiatToken Paths -------
+    // -------- FiatToken Paths --------
 
     access(all) let VaultStoragePath: StoragePath
     access(all) let VaultBalancePubPath: PublicPath
@@ -92,6 +94,25 @@ access(all) contract FiatToken: FungibleToken {
 
     // ------- Old FiatToken Interfaces, kept for backwards compatibility, but all functionality has been removed
     access(all) resource interface ResourceId {}
+    access(all) resource interface AdminCapReceiver {}
+    access(all) resource interface OwnerCapReceiver {}
+    access(all) resource interface MasterMinterCapReceiver {}
+    access(all) resource interface BlocklisterCapReceiver {}
+    access(all) resource interface PauseCapReceiver {}
+    
+    // ------- Old FiatToken resource types that needed to be removed
+    #removedType(AdminExecutor)
+    #removedType(Admin)
+    #removedType(OwnerExecutor)
+    #removedType(Owner)
+    #removedType(MasterMinterExecutor)
+    #removedType(MasterMinter)
+    #removedType(MinterController)
+    #removedType(Minter)
+    #removedType(BlocklistExecutor)
+    #removedType(Blocklister)
+    #removedType(PauseExecutor)
+    #removedType(Pauser)
 
     // ------- FiatToken Resources -------
 
