@@ -118,7 +118,7 @@ fun setup() {
 access(all)
 fun testGetTotalSupply() {
     let scriptResult = executeScript(
-        "../scripts/get_total_supply.cdc",
+        "../scripts/contract/get_total_supply.cdc",
         []
     )
     Test.expect(scriptResult, Test.beSucceeded())

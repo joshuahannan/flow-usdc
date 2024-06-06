@@ -6,12 +6,6 @@ import "OnChainMultiSig"
 import "IBridgePermissions"
 
 access(all) contract FiatToken: FungibleToken, IBridgePermissions {
-
-    // Indicates that the FiatToken contract does not allow bridging
-    // at the moment
-    access(all) view fun allowsBridging(): Bool {
-        return false
-    }
 	
 	// ------- FiatToken Events -------
 	
@@ -152,61 +146,6 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
         for controller in controllers {
             controller.delete()
         }
-    }
-
-    // -------- ViewResolver Functions for MetadataViews --------
-
-    access(all) view fun getContractViews(resourceType: Type?): [Type] {
-        return [
-            Type<FungibleTokenMetadataViews.FTView>(),
-            Type<FungibleTokenMetadataViews.FTDisplay>(),
-            Type<FungibleTokenMetadataViews.FTVaultData>(),
-            Type<FungibleTokenMetadataViews.TotalSupply>()
-        ]
-    }
-
-    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
-        switch viewType {
-            case Type<FungibleTokenMetadataViews.FTView>():
-                return FungibleTokenMetadataViews.FTView(
-                    ftDisplay: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
-                    ftVaultData: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
-                )
-            case Type<FungibleTokenMetadataViews.FTDisplay>():
-                let media = MetadataViews.Media(
-                        file: MetadataViews.HTTPFile(
-                        url: ""
-                    ),
-                    mediaType: ""
-                )
-                let medias = MetadataViews.Medias([media])
-                return FungibleTokenMetadataViews.FTDisplay(
-                    name: "Circle USDC",
-                    symbol: "USDC",
-                    description: "This is the Flow Cadence version of USDC",
-                    externalURL: MetadataViews.ExternalURL("https://www.circle.com/en/usdc"),
-                    logos: medias,
-                    socials: {
-                        "twitter": MetadataViews.ExternalURL("https://twitter.com/circle")
-                    }
-                )
-            case Type<FungibleTokenMetadataViews.FTVaultData>():
-                return FungibleTokenMetadataViews.FTVaultData(
-                    storagePath: self.VaultStoragePath,
-                    receiverPath: self.VaultReceiverPubPath,
-                    metadataPath: self.VaultBalancePubPath,
-                    receiverLinkedType: Type<&FiatToken.Vault>(),
-                    metadataLinkedType: Type<&FiatToken.Vault>(),
-                    createEmptyVaultFunction: (fun(): @{FungibleToken.Vault} {
-                        return <-FiatToken.createEmptyVault(vaultType: Type<@FiatToken.Vault>())
-                    })
-                )
-            case Type<FungibleTokenMetadataViews.TotalSupply>():
-                return FungibleTokenMetadataViews.TotalSupply(
-                    totalSupply: FiatToken.totalSupply
-                )
-        }
-        return nil
     }
 	
 	// ------- FiatToken Resources -------
@@ -992,6 +931,67 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 		self.account.contracts.update(name: name, code: code)
 		self.version = version
 	}
+
+    // Indicates that the FiatToken contract does not allow bridging
+    // at the moment
+    access(all) view fun allowsBridging(): Bool {
+        return false
+    }
+
+    // -------- ViewResolver Functions for MetadataViews --------
+
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<FungibleTokenMetadataViews.FTView>(),
+            Type<FungibleTokenMetadataViews.FTDisplay>(),
+            Type<FungibleTokenMetadataViews.FTVaultData>(),
+            Type<FungibleTokenMetadataViews.TotalSupply>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<FungibleTokenMetadataViews.FTView>():
+                return FungibleTokenMetadataViews.FTView(
+                    ftDisplay: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
+                    ftVaultData: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
+                )
+            case Type<FungibleTokenMetadataViews.FTDisplay>():
+                let media = MetadataViews.Media(
+                        file: MetadataViews.HTTPFile(
+                        url: ""
+                    ),
+                    mediaType: ""
+                )
+                let medias = MetadataViews.Medias([media])
+                return FungibleTokenMetadataViews.FTDisplay(
+                    name: "Circle USDC",
+                    symbol: "USDC",
+                    description: "This is the Flow Cadence version of USDC",
+                    externalURL: MetadataViews.ExternalURL("https://www.circle.com/en/usdc"),
+                    logos: medias,
+                    socials: {
+                        "twitter": MetadataViews.ExternalURL("https://twitter.com/circle")
+                    }
+                )
+            case Type<FungibleTokenMetadataViews.FTVaultData>():
+                return FungibleTokenMetadataViews.FTVaultData(
+                    storagePath: self.VaultStoragePath,
+                    receiverPath: self.VaultReceiverPubPath,
+                    metadataPath: self.VaultBalancePubPath,
+                    receiverLinkedType: Type<&FiatToken.Vault>(),
+                    metadataLinkedType: Type<&FiatToken.Vault>(),
+                    createEmptyVaultFunction: (fun(): @{FungibleToken.Vault} {
+                        return <-FiatToken.createEmptyVault(vaultType: Type<@FiatToken.Vault>())
+                    })
+                )
+            case Type<FungibleTokenMetadataViews.TotalSupply>():
+                return FungibleTokenMetadataViews.TotalSupply(
+                    totalSupply: FiatToken.totalSupply
+                )
+        }
+        return nil
+    }
 	
 	// ------- FiatToken Initializer -------
     init(
