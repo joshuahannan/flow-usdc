@@ -3,9 +3,9 @@
 import FiatToken from 0x{{.FiatToken}}
 
 transaction {
-    prepare (pauser: AuthAccount) {
+    prepare (pauser: auth(BorrowValue) &Account) {
 
-        let pauser = pauser.borrow<&FiatToken.Pauser>(from: FiatToken.PauserStoragePath) ?? panic("cannot borrow own private path")
+        let pauser = pauser.storage.borrow<&FiatToken.Pauser>(from: FiatToken.PauserStoragePath) ?? panic("cannot borrow own private path")
         pauser.unpause();
     } 
 

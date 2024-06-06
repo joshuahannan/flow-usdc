@@ -7,7 +7,7 @@ import OnChainMultiSig from 0x{{.OnChainMultiSig}}
 
 transaction (sig: String, txIndex: UInt64, method: String, args: [AnyStruct], publicKey: String, resourceAddr: Address, resourcePubSignerPath: PublicPath) {
     let rsc: @AnyResource?
-    prepare(oneOfMultiSig: AuthAccount) {
+    prepare(oneOfMultiSig: &Account) {
         self.rsc <- nil
     }
 

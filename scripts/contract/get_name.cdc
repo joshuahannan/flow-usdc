@@ -2,6 +2,6 @@
 
 import FiatToken from 0x{{.FiatToken}}
 
-pub fun main(): String{
+access(all) fun main(): String{
     return FiatToken.name
 }

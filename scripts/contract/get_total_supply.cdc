@@ -3,7 +3,7 @@
 
 import FiatToken from 0x{{.FiatToken}}
 
-pub fun main(): UFix64 {
+access(all) fun main(): UFix64 {
 
     let supply = FiatToken.totalSupply
 

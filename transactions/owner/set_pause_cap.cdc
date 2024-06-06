@@ -4,12 +4,12 @@
 import FiatToken from 0x{{.FiatToken}}
 
 transaction (pauser: Address) {
-    prepare(pauseExe: AuthAccount) {
-        let cap = pauseExe.getCapability<&FiatToken.PauseExecutor>(FiatToken.PauseExecutorPrivPath);
+    prepare(pauseExe: auth(BorrowValue) &Account) {
+        let cap = pauseExe.capabilities.get<&FiatToken.PauseExecutor>(FiatToken.PauseExecutorPrivPath);
         if !cap.check() {
             panic ("cannot borrow such capability") 
         } else {
-            let setCapRef = getAccount(pauser).getCapability<&FiatToken.Pauser{FiatToken.PauseCapReceiver}>(FiatToken.PauserCapReceiverPubPath).borrow() ?? panic("Cannot get pauseCapReceiver");
+            let setCapRef = getAccount(pauser).capabilities.get<&FiatToken.Pauser{FiatToken.PauseCapReceiver}>(FiatToken.PauserCapReceiverPubPath).borrow() ?? panic("Cannot get pauseCapReceiver");
             setCapRef.setPauseCap(cap: cap);
         }
     }

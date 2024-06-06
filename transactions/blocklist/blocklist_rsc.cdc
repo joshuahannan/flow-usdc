@@ -6,8 +6,8 @@
 import FiatToken from 0x{{.FiatToken}}
 
 transaction(resourceId: UInt64) {
-    prepare (blocklister: AuthAccount) {
-        let blocklister = blocklister.borrow<&FiatToken.Blocklister>(from: FiatToken.BlocklisterStoragePath) ?? panic("cannot borrow own private path")
+    prepare (blocklister: auth(BorrowValue) &Account) {
+        let blocklister = blocklister.storage.borrow<&FiatToken.Blocklister>(from: FiatToken.BlocklisterStoragePath) ?? panic("cannot borrow own private path")
         blocklister.blocklist(resourceId: resourceId);
     } 
 

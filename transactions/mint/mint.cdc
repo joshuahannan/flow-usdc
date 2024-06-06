@@ -7,15 +7,15 @@ import FiatToken from 0x{{.FiatToken}}
 transaction (amount: UFix64, receiver: Address) {
     let mintedVault: @FungibleToken.Vault;
 
-    prepare(minter: AuthAccount) {
-        let m = minter.borrow<&FiatToken.Minter>(from: FiatToken.MinterStoragePath) 
+    prepare(minter: auth(BorrowValue) &Account) {
+        let m = minter.storage.borrow<&FiatToken.Minter>(from: FiatToken.MinterStoragePath) 
             ?? panic ("no minter resource avaialble");
         self.mintedVault <- m.mint(amount: amount)
     }
 
     execute {
         let recvAcct = getAccount(receiver);
-        let receiverRef = recvAcct.getCapability(FiatToken.VaultReceiverPubPath)
+        let receiverRef = recvAcct.capabilities.get(FiatToken.VaultReceiverPubPath)
             .borrow<&{FungibleToken.Receiver}>()
             ?? panic("Could not borrow receiver reference to the recipient's Vault")
 
