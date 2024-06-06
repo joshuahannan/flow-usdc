@@ -102,13 +102,13 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 	access(all)	var totalSupply: UFix64
 	
 	// Blocked resources dictionary {resourceId: Block Height}
-	access(all)	let blocklist: {UInt64: UInt64}
+	access(contract) let blocklist: {UInt64: UInt64}
 	
 	// Managed minters dictionary {MinterController: Minter}
-	access(all)	let managedMinters: {UInt64: UInt64}
+	access(contract) let managedMinters: {UInt64: UInt64}
 	
 	// Minter allowance dictionary {Minter: Allowance}
-	access(all)	let minterAllowances: {UInt64: UFix64}
+	access(contract) let minterAllowances: {UInt64: UFix64}
 	
 	// ------- FiatToken Interfaces  -------
 	access(all)	resource interface ResourceId { 
@@ -149,7 +149,7 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
     }
 	
 	// ------- FiatToken Resources -------
-	access(all)	resource Vault: ResourceId, FungibleToken.Vault {
+	access(all) resource Vault: ResourceId, FungibleToken.Vault {
 
 		access(all)	var balance: UFix64
 
