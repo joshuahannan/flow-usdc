@@ -3,7 +3,8 @@ import BlockchainHelpers
 import "test_helpers.cdc"
 import "FungibleToken"
 //import "FungibleTokenMetadataViews"
-//import "FiatToken"
+import "FiatToken"
+import Crypto
 
 access(all) let admin = Test.getAccount(0x0000000000000007)
 access(all) let recipient = Test.createAccount()
@@ -55,6 +56,22 @@ access(all) let version = "2.0.0"
 access(all) let initTotalSupply = 1000.0
 access(all) let initPaused = false
 
+access(all) let adminPubKeys: [String] = []
+access(all) let adminPubKeysWeights: [UFix64] = []
+access(all) let adminPubKeysAlgos: [UInt8] = []
+access(all) let ownerPubKeys: [String] = []
+access(all) let ownerPubKeysWeights: [UFix64] = []
+access(all) let ownerPubKeysAlgos: [UInt8] = []
+access(all) let masterMinterPubKeys: [String] = []
+access(all) let masterMinterPubKeysWeights: [UFix64] = []
+access(all) let masterMinterPubKeysAlgos: [UInt8] = []
+access(all) let blocklisterPubKeys: [String] = []
+access(all) let blocklisterPubKeysWeights: [UFix64] = []
+access(all) let blocklisterPubKeysAlgos: [UInt8] = []
+access(all) let pauserPubKeys: [String] = []
+access(all) let pauserPubKeysWeights: [UFix64] = []
+access(all) let pauserPubKeysAlgos: [UInt8] = []
+
 access(all)
 fun setup() {
     deployWithArgs(
@@ -73,44 +90,59 @@ fun setup() {
         "FiatToken",
         "../contracts/FiatToken.cdc",
         args: [
-            VaultStoragePath,
-            VaultBalancePubPath,
-            VaultReceiverPubPath,
-            VaultUUIDPubPath,
-            BlocklistExecutorStoragePath,
-            BlocklisterStoragePath,
-            BlocklisterCapReceiverPubPath,
-            BlocklisterUUIDPubPath,
-            BlocklisterPubSigner,
-            PauseExecutorStoragePath,
-            PauserStoragePath,
-            PauserCapReceiverPubPath,
-            PauserUUIDPubPath,
-            PauserPubSigner,
-            AdminExecutorStoragePath,
-            AdminStoragePath,
-            AdminCapReceiverPubPath,
-            AdminUUIDPubPath,
-            AdminPubSigner,
-            OwnerExecutorStoragePath,
-            OwnerStoragePath,
-            OwnerCapReceiverPubPath,
-            OwnerUUIDPubPath,
-            OwnerPubSigner,
-            MasterMinterExecutorStoragePath,
-            MasterMinterStoragePath,
-            MasterMinterCapReceiverPubPath,
-            MasterMinterPubSigner,
-            MasterMinterUUIDPubPath,
-            MinterControllerStoragePath,
-            MinterControllerUUIDPubPath,
-            MinterControllerPubSigner,
-            MinterStoragePath,
-            MinterUUIDPubPath,
-            tokenName,
-            version,
-            initTotalSupply,
-            initPaused
+            // VaultStoragePath,
+            // VaultBalancePubPath,
+            // VaultReceiverPubPath,
+            // VaultUUIDPubPath,
+            // BlocklistExecutorStoragePath,
+            // BlocklisterStoragePath,
+            // BlocklisterCapReceiverPubPath,
+            // BlocklisterUUIDPubPath,
+            // BlocklisterPubSigner,
+            // PauseExecutorStoragePath,
+            // PauserStoragePath,
+            // PauserCapReceiverPubPath,
+            // PauserUUIDPubPath,
+            // PauserPubSigner,
+            // AdminExecutorStoragePath,
+            // AdminStoragePath,
+            // AdminCapReceiverPubPath,
+            // AdminUUIDPubPath,
+            // AdminPubSigner,
+            // OwnerExecutorStoragePath,
+            // OwnerStoragePath,
+            // OwnerCapReceiverPubPath,
+            // OwnerUUIDPubPath,
+            // OwnerPubSigner,
+            // MasterMinterExecutorStoragePath,
+            // MasterMinterStoragePath,
+            // MasterMinterCapReceiverPubPath,
+            // MasterMinterPubSigner,
+            // MasterMinterUUIDPubPath,
+            // MinterControllerStoragePath,
+            // MinterControllerUUIDPubPath,
+            // MinterControllerPubSigner,
+            // MinterStoragePath,
+            // MinterUUIDPubPath,
+            // tokenName,
+            // version,
+            // initTotalSupply,
+            // initPaused,
+            adminPubKeys,
+            adminPubKeysWeights,
+            adminPubKeysAlgos,
+            ownerPubKeys,
+            ownerPubKeysWeights,
+            ownerPubKeysAlgos,
+            masterMinterPubKeys,
+            masterMinterPubKeysWeights,
+            masterMinterPubKeysAlgos,
+            blocklisterPubKeys,
+            blocklisterPubKeysWeights,
+            blocklisterPubKeysAlgos,
+            pauserPubKeys,
+            pauserPubKeysWeights,
+            pauserPubKeysAlgos
         ]
     )
 }
@@ -127,51 +159,51 @@ fun testGetTotalSupply() {
     Test.assertEqual(1000.00000000, totalSupply)
 }
 
-// access(all)
-// fun testSetupAccount() {
-//     let txResult = executeTransaction(
-//         "../transactions/vault/create_vault.cdc",
-//         [],
-//         recipient
-//     )
-//     Test.expect(txResult, Test.beSucceeded())
-// }
+access(all)
+fun testSetupAccount() {
+    let txResult = executeTransaction(
+        "../transactions/vault/create_vault.cdc",
+        [],
+        recipient
+    )
+    Test.expect(txResult, Test.beSucceeded())
+}
 
-// access(all)
-// fun testMintTokens() {
-//     let txResult = executeTransaction(
-//         "../transactions/mint/mint.cdc",
-//         [recipient.address, 250.0],
-//         admin
-//     )
-//     Test.expect(txResult, Test.beSucceeded())
+access(all)
+fun testMintTokens() {
+    let txResult = executeTransaction(
+        "../transactions/mint/mint.cdc",
+        [250.0, recipient.address],
+        admin
+    )
+    Test.expect(txResult, Test.beSucceeded())
 
-//     // Test that the proper events were emitted
-//     var typ = Type<FiatToken.Mint>()
-//     var events = Test.eventsOfType(typ)
-//     Test.assertEqual(1, events.length)
+    // Test that the proper events were emitted
+    var typ = Type<FiatToken.Mint>()
+    var events = Test.eventsOfType(typ)
+    Test.assertEqual(1, events.length)
 
-//     let tokensMintedEvent = events[0] as! FiatToken.Mint
-//     Test.assertEqual(250.0, tokensMintedEvent.amount)
+    let tokensMintedEvent = events[0] as! FiatToken.Mint
+    Test.assertEqual(250.0, tokensMintedEvent.amount)
 
-//     typ = Type<FungibleToken.Deposited>()
-//     let depositEvents = Test.eventsOfType(typ)
+    typ = Type<FungibleToken.Deposited>()
+    let depositEvents = Test.eventsOfType(typ)
 
-//     let tokensDepositedEvent = depositEvents[depositEvents.length - 1] as! FungibleToken.Deposited
-//     Test.assertEqual(250.0, tokensDepositedEvent.amount)
-//     Test.assertEqual(recipient.address, tokensDepositedEvent.to!)
-//     Test.assertEqual("A.0000000000000007.FiatToken.Vault", tokensDepositedEvent.type)
+    let tokensDepositedEvent = depositEvents[depositEvents.length - 1] as! FungibleToken.Deposited
+    Test.assertEqual(250.0, tokensDepositedEvent.amount)
+    Test.assertEqual(recipient.address, tokensDepositedEvent.to!)
+    Test.assertEqual("A.0000000000000007.FiatToken.Vault", tokensDepositedEvent.type)
 
-//     // Test that the totalSupply increased by the amount of minted tokens
-//     let scriptResult = executeScript(
-//         "../transactions/scripts/get_supply.cdc",
-//         []
-//     )
-//     Test.expect(scriptResult, Test.beSucceeded())
+    // Test that the totalSupply increased by the amount of minted tokens
+    let scriptResult = executeScript(
+        "../scripts/contract/get_total_supply.cdc",
+        []
+    )
+    Test.expect(scriptResult, Test.beSucceeded())
 
-//     let totalSupply = scriptResult.returnValue! as! UFix64
-//     Test.assertEqual(1250.0, totalSupply)
-// }
+    let totalSupply = scriptResult.returnValue! as! UFix64
+    Test.assertEqual(1250.0, totalSupply)
+}
 
 // access(all)
 // fun testTransferTokens() {

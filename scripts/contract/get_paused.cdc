@@ -1,6 +1,6 @@
 // Gets the pause state of the contract
 
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 access(all) fun main(): Bool {
     return FiatToken.paused

@@ -5,8 +5,8 @@
 // MinterController are assigned Minter by the UUID.
 // If a new one is created, the UUID will be different and will not have the same Minter to control.
 
-import FiatToken from 0x{{.FiatToken}}
-import OnChainMultiSig from 0x{{.OnChainMultiSig}}
+import "FiatToken"
+import "OnChainMultiSig"
 
 transaction(minterControllerAddr: Address, publicKeys: [String], pubKeyWeights: [UFix64], multiSigAlgos: [UInt8]) {
 

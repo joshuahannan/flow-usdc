@@ -1,7 +1,7 @@
 // This script gets the weight of a stored access(all)lic key in a multiSigManager for a resource 
 
-import OnChainMultiSig from 0x{{.OnChainMultiSig}}
-import FiatToken from 0x{{.FiatToken}}
+import "OnChainMultiSig"
+import "FiatToken"
 
 access(all) fun main(resourceAddr: Address, key: String, resourcePubSignerPath: PublicPath): UFix64 {
     let resourceAcct = getAccount(resourceAddr)

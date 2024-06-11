@@ -4,9 +4,9 @@
 // `resourcePubSignerPath` must have been linked by the resource owner
 // `txIndex` must be the current resource index incremented by 1
 
-import FiatToken from 0x{{.FiatToken}}
-import OnChainMultiSig from 0x{{.OnChainMultiSig}}
-import FungibleToken from 0x{{.FungibleToken}}
+import "FiatToken"
+import "OnChainMultiSig"
+import "FungibleToken"
 
 transaction (sig: [String], txIndex: UInt64, method: String, args: [AnyStruct], publicKey: [String], resourceAddr: Address, resourcePubSignerPath: PublicPath) {
     let rsc: @AnyResource?

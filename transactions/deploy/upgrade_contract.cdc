@@ -1,4 +1,4 @@
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 // This transactions upgrades the FiatToken contract with a resource
 //
 // Admin (auth(BorrowValue) &Account) of this script is the owner of the contract

@@ -5,8 +5,8 @@
 // The withdraw amount and the account from getAccount
 // would be the parameters to the transaction
 
-import FungibleToken from 0x{{.FungibleToken}}
-import FiatToken from 0x{{.FiatToken}}
+import "FungibleToken"
+import "FiatToken"
 
 transaction(amount: UFix64, to: Address) {
 

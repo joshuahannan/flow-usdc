@@ -1,6 +1,6 @@
 // Masterminter uses this to configure which Minter the MinterController manages
 
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 transaction (minter: UInt64, minterController: UInt64) {
     prepare(masterMinter: auth(BorrowValue) &Account) {

@@ -1,7 +1,7 @@
 // The account with the PauseExecutor Resource can use this script to 
 // provide capability for a pauser to pause the contract
 
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 transaction (pauser: Address) {
     prepare(pauseExe: auth(BorrowValue) &Account) {

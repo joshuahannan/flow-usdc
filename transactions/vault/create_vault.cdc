@@ -9,11 +9,11 @@
 // 
 // Therefore if multisig is required for the vault, the account itself should have the same key weight
 // distribution as it does for the Vault.
-import FungibleToken from 0x{{.FungibleToken}}
-import FiatToken from 0x{{.FiatToken}}
-import OnChainMultiSig from 0x{{.OnChainMultiSig}}
+import "FungibleToken"
+import "FiatToken"
+import "OnChainMultiSig"
 
-transaction(multiSigPubKeys: [String], multiSigKeyWeights: [UFix64], multiSigAlgos: [UInt8]) {
+transaction {
 
     prepare(signer: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, SaveValue) &Account) {
 
@@ -32,17 +32,7 @@ transaction(multiSigPubKeys: [String], multiSigKeyWeights: [UFix64], multiSigAlg
             FiatToken.VaultStoragePath
         )
         signer.capabilities.publish(vaultCap, at: FiatToken.VaultUUIDPubPath)
-
-        // Create a public Capability to the Vault's Receiver functionality
-        let receiverCap = signer.capabilities.storage.issue<&FiatToken.Vault>(
-            vaultData.storagePath
-        )
-        signer.capabilities.publish(receiverCap, at: FiatToken.VaultReceiverPubPath)
-
-                // Create a public Capability to the Vault's Receiver functionality
-        let receiverCap = signer.capabilities.storage.issue<&FiatToken.Vault>(
-            vaultData.storagePath
-        )
-        signer.capabilities.publish(receiverCap, at: FiatToken.VaultBalancePubPath)
+        signer.capabilities.publish(vaultCap, at: FiatToken.VaultReceiverPubPath)
+        signer.capabilities.publish(vaultCap, at: FiatToken.VaultBalancePubPath)
     }
 }

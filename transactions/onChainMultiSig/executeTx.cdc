@@ -4,9 +4,9 @@
 // other types of returned resource is destroyed (both cases not used in FiatToken)
 // 
 
-import FiatToken from 0x{{.FiatToken}}
-import OnChainMultiSig from 0x{{.OnChainMultiSig}}
-import FungibleToken from 0x{{.FungibleToken}}
+import "FiatToken"
+import "OnChainMultiSig"
+import "FungibleToken"
 
 transaction (txIndex: UInt64, resourceAddr: Address, resourcePubSignerPath: PublicPath) {
     let recv: &{FungibleToken.Receiver}

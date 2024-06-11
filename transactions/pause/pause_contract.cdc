@@ -1,6 +1,6 @@
 // This pauses the contract by a Pauser if capability was granted
 
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 transaction {
     prepare (pauser: auth(BorrowValue) &Account) {

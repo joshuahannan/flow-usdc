@@ -1,5 +1,5 @@
 // This gets the publi signer path for different resources
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 access(all) fun main(resourceName: String): PublicPath {
     switch resourceName {

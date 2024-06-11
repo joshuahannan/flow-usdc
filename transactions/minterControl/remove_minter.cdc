@@ -1,7 +1,7 @@
 // MinterController uses this to remove Minter 
 // A Minter must have been configured and under such control
 
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 transaction () {
     prepare(minterController: auth(BorrowValue) &Account) {

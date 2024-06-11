@@ -1,7 +1,7 @@
 // MinterController uses this to configure minter allowance 
 // It succeeds of MinterController has assigned Minter from MasterMinter
 
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 transaction (amount: UFix64) {
     prepare(minterController: auth(BorrowValue) &Account) {

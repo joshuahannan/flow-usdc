@@ -7,7 +7,7 @@
   },
   "deployments": {
     "emulator": {
-      "emulator-owner": ["FiatTokenInterface", "OnChainMultiSig"],
+      "emulator-owner": ["IBridgePermissions", "OnChainMultiSig", "FiatToken"],
       "emulator-allowance": [],
       "emulator-blocklister": [],
       "emulator-minter": [],
@@ -80,6 +80,7 @@
     "OnChainMultiSig": {
       "source": "./contracts/OnChainMultiSig.cdc",
       "aliases": {
+        "emulator": "0x01cf0e2f2f715450",
         "testing": "0x0000000000000007",
         "testnet": "0x5a5b0a73a29e83f1",
         "mainnet": "0x220c1b4155f86f2f"
@@ -88,6 +89,7 @@
     "IBridgePermissions": {
       "source": "./contracts/utility/IBridgePermissions.cdc",
       "aliases": {
+        "emulator": "0x01cf0e2f2f715450",
         "testing": "0x0000000000000007"
       }
     }

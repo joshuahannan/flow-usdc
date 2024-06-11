@@ -1,7 +1,7 @@
 // The account with the BlocklistExecutor Resource can use this script to 
 // provide capability for a blocklister to blocklist resources
 
-import FiatToken from 0x{{.FiatToken}}
+import "FiatToken"
 
 transaction (blocklister: Address) {
     prepare(blocklistExe: auth(BorrowValue) &Account) {

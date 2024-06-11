@@ -5,8 +5,8 @@
 // Pauser does not have capability to blocklist until granted by owner of PauseExecutor.
 // If a new one is created, the capability will be lost
 
-import FiatToken from 0x{{.FiatToken}}
-import OnChainMultiSig from 0x{{.OnChainMultiSig}}
+import "FiatToken"
+import "OnChainMultiSig"
 
 transaction(pauserAddr: Address, publicKeys: [String], pubKeyWeights: [UFix64], multiSigAlgos: [UInt8]) {
 
