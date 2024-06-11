@@ -116,6 +116,26 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
             return self.uuid
         }
 	}
+
+    access(all) resource interface MultiSigManagerDefaultImpl {
+        access(OnChainMultiSig.Owner) let multiSigManager: @OnChainMultiSig.Manager
+
+        access(all) fun addNewPayload(payload: @OnChainMultiSig.PayloadDetails, publicKey: String, sig: [UInt8]) { 
+			self.multiSigManager.addNewPayload(resourceId: self.uuid, payload: <-payload, publicKey: publicKey, sig: sig)
+		}
+        access(all) fun addPayloadSignature (txIndex: UInt64, publicKey: String, sig: [UInt8]) { 
+			self.multiSigManager.addPayloadSignature(resourceId: self.uuid, txIndex: txIndex, publicKey: publicKey, sig: sig)
+		}
+        access(all) view fun getTxIndex(): UInt64 { 
+			return self.multiSigManager.txIndex
+		}
+        access(all) fun getSignerKeys(): [String] { 
+			return self.multiSigManager.getSignerKeys()
+		}
+        access(all) fun getSignerKeyAttr(publicKey: String): OnChainMultiSig.PubKeyAttr? { 
+			return self.multiSigManager.getSignerKeyAttr(publicKey: publicKey)
+		}
+    }
 	
 	access(all)	resource interface AdminCapReceiver { 
 		access(all) fun setAdminCap(cap: Capability<&FiatToken.AdminExecutor>): Void
@@ -263,7 +283,7 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 	
     /// Multisig signers call public functions in this resource
     /// to submit signatures to execute AdminExecutor functionality
-	access(all)	resource Admin: OnChainMultiSig.PublicSigner, ResourceId, AdminCapReceiver { 
+	access(all)	resource Admin: OnChainMultiSig.PublicSigner, ResourceId, AdminCapReceiver, MultiSigManagerDefaultImpl { 
 
 		access(OnChainMultiSig.Owner) let multiSigManager: @OnChainMultiSig.Manager
 		
@@ -377,7 +397,7 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 		}
 	}
 	
-	access(all)	resource Owner: OnChainMultiSig.PublicSigner, ResourceId, OwnerCapReceiver { 
+	access(all)	resource Owner: OnChainMultiSig.PublicSigner, ResourceId, OwnerCapReceiver, MultiSigManagerDefaultImpl { 
 		access(OnChainMultiSig.Owner) let multiSigManager: @OnChainMultiSig.Manager
 		
 		access(self) var ownerExecutorCapability: Capability<&OwnerExecutor>?
@@ -451,7 +471,7 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 		}
 	}
 	
-	access(all)	resource MasterMinter: ResourceId, OnChainMultiSig.PublicSigner, MasterMinterCapReceiver{ 
+	access(all)	resource MasterMinter: ResourceId, OnChainMultiSig.PublicSigner, MasterMinterCapReceiver, MultiSigManagerDefaultImpl { 
 		access(OnChainMultiSig.Owner) let multiSigManager: @OnChainMultiSig.Manager
 		
 		access(self) var masterMinterExecutorCapability: Capability<&MasterMinterExecutor>?
@@ -501,7 +521,7 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 		}
 	}
 	
-	access(all) resource MinterController: ResourceId, OnChainMultiSig.PublicSigner { 
+	access(all) resource MinterController: ResourceId, OnChainMultiSig.PublicSigner, MultiSigManagerDefaultImpl { 
 		access(OnChainMultiSig.Owner) let multiSigManager: @OnChainMultiSig.Manager
 		
 		access(OnChainMultiSig.Owner) fun configureMinterAllowance(allowance: UFix64) { 
@@ -600,7 +620,7 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 		}
 	}
 	
-	access(all) resource Blocklister: ResourceId, BlocklisterCapReceiver, OnChainMultiSig.PublicSigner { 
+	access(all) resource Blocklister: ResourceId, BlocklisterCapReceiver, OnChainMultiSig.PublicSigner, MultiSigManagerDefaultImpl { 
 		access(self) var blocklistCap: Capability<&BlocklistExecutor>?
 		
 		access(OnChainMultiSig.Owner) let multiSigManager: @OnChainMultiSig.Manager
@@ -675,7 +695,7 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 		}
 	}
 	
-	access(all)	resource Pauser: ResourceId, PauseCapReceiver, OnChainMultiSig.PublicSigner { 
+	access(all)	resource Pauser: ResourceId, PauseCapReceiver, OnChainMultiSig.PublicSigner, MultiSigManagerDefaultImpl { 
 		access(self) var pauseCap: Capability<&PauseExecutor>?
 		
 		access(OnChainMultiSig.Owner) let multiSigManager: @OnChainMultiSig.Manager

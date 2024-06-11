@@ -29,24 +29,13 @@ access(all) contract OnChainMultiSig {
     /// to submit transaction payloads and signatures for 
     /// functionality that the implementing resource is configured for
     access(all) resource interface PublicSigner {
-        access(Owner) let multiSigManager: @OnChainMultiSig.Manager
-        access(all) fun addNewPayload(payload: @PayloadDetails, publicKey: String, sig: [UInt8]) { 
-			self.multiSigManager.addNewPayload(resourceId: self.uuid, payload: <-payload, publicKey: publicKey, sig: sig)
-		}
-        access(all) fun addPayloadSignature (txIndex: UInt64, publicKey: String, sig: [UInt8]) { 
-			self.multiSigManager.addPayloadSignature(resourceId: self.uuid, txIndex: txIndex, publicKey: publicKey, sig: sig)
-		}
+        access(all) fun addNewPayload(payload: @PayloadDetails, publicKey: String, sig: [UInt8])
+        access(all) fun addPayloadSignature (txIndex: UInt64, publicKey: String, sig: [UInt8])
         access(all) fun executeTx(txIndex: UInt64): @AnyResource?
         access(all) view fun UUID(): UInt64
-        access(all) view fun getTxIndex(): UInt64 { 
-			return self.multiSigManager.txIndex
-		}
-        access(all) fun getSignerKeys(): [String] { 
-			return self.multiSigManager.getSignerKeys()
-		}
-        access(all) fun getSignerKeyAttr(publicKey: String): PubKeyAttr? { 
-			return self.multiSigManager.getSignerKeyAttr(publicKey: publicKey)
-		}
+        access(all) view fun getTxIndex(): UInt64
+        access(all) fun getSignerKeys(): [String]
+        access(all) fun getSignerKeyAttr(publicKey: String): PubKeyAttr?
     }
     
     
