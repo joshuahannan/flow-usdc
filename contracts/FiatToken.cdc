@@ -5,7 +5,7 @@ import "MetadataViews"
 import "OnChainMultiSig"
 import "IBridgePermissions"
 
-access(all) contract FiatToken: FungibleToken, IBridgePermissions {
+access(all) contract FiatToken: FungibleToken {
 	
 	// ------- FiatToken Events -------
 	
@@ -214,7 +214,7 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
             return amount <= self.balance
         }
 		
-		access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} { 
+		access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
 			pre { 
 				!FiatToken.paused:
 					"Cannot withdraw USDC while the FiatToken contract is paused"
@@ -815,12 +815,6 @@ access(all) contract FiatToken: FungibleToken, IBridgePermissions {
 		self.account.contracts.update(name: name, code: code)
 		self.version = version
 	}
-
-    // Indicates that the FiatToken contract does not allow bridging
-    // at the moment
-    access(all) view fun allowsBridging(): Bool {
-        return false
-    }
 
     // -------- ViewResolver Functions for MetadataViews --------
 
