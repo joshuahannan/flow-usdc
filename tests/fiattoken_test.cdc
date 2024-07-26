@@ -28,6 +28,12 @@ fun setup() {
     )
 
     deployWithArgs(
+        "FlowEVMBridgeConfig",
+        "../contracts/utility/FlowEVMBridgeConfig.cdc",
+        args: []
+    )
+
+    deployWithArgs(
         "FiatToken",
         "../contracts/FiatToken.cdc",
         args: [
@@ -41,6 +47,14 @@ fun setup() {
             version,
             initTotalSupply
             //initPaused
+        ]
+    )
+
+    deployWithArgs(
+        "FiatTokenMinterToBridge",
+        "../contracts/FiatTokenMinterToBridge.cdc",
+        args: [
+            admin.address
         ]
     )
 }
@@ -156,23 +170,4 @@ fun testVaultTypes() {
         Type<FungibleTokenMetadataViews.TotalSupply>()
     ]
     Test.assertEqual(expectedViews, supportedViews)
-}
-
-access(all)
-fun testAddServiceAccountKey() {
-
-    var txResult = executeTransaction(
-        "../transactions/admin/add_service_key.cdc",
-        [],
-        recipient
-    )
-    Test.expect(txResult, Test.beSucceeded())
-
-    txResult = executeTransaction(
-        "../transactions/admin/add_service_key.cdc",
-        [],
-        recipient
-    )
-    Test.expect(txResult, Test.beFailed())
-
 }

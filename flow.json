@@ -18,6 +18,14 @@
     }
   },
   "contracts": {
+    "EVM": {
+        "source": "./contracts/utility/EVM.cdc",
+        "aliases": {
+          "emulator": "0xf8d6e0586b0a20c7",
+          "testing": "0x0000000000000001",
+          "previewnet": "0xb6763b4399a888c8"
+        }
+    },
     "FungibleToken": {
       "source": "./contracts/utility/FungibleToken.cdc",
       "aliases": {
@@ -65,12 +73,36 @@
         "mainnet": "0xb19436aae4d94622"
       }
     },
+    "FiatTokenMinterToBridge": {
+        "source": "./contracts/FiatTokenMinterToBridge.cdc",
+        "aliases": {
+          "testing": "0x0000000000000007",
+          "testnet": "0xa983fecbed621163",
+          "mainnet": "0xb19436aae4d94622"
+        }
+      },
+    "FlowToken": {
+        "source": "./contracts/utility/FlowToken.cdc",
+        "aliases": {
+          "emulator": "0x0ae53cb6e3f42a79",
+          "testing": "0x0000000000000003",
+          "previewnet": "0x4445e7ad11568276",
+          "mainnet": "0x1654653399040a61",
+          "testnet": "0x7e60df042a9c0868"
+        }
+      },
     "FlowEVMBridgeHandlerInterfaces": {
       "source": "./contracts/utility/FlowEVMBridgeHandlerInterfaces.cdc",
       "aliases": {
         "testing": "0x0000000000000007"
       }
     },
+    "FlowEVMBridgeConfig": {
+        "source": "./contracts/utility/FlowEVMBridgeConfig.cdc",
+        "aliases": {
+          "testing": "0x0000000000000007"
+        }
+      },
     "FlowServiceAccount": {
       "aliases": {
         "testing": "0x0000000000000001",
