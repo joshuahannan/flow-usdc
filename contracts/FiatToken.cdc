@@ -4,40 +4,48 @@ import "MetadataViews"
 import "Burner"
 import "FlowEVMBridgeHandlerInterfaces"
 
+/// Replaces Pre-Cadence 1.0 FiatToken to act as the bridged
+/// version of the EVM FiatToken
+
 access(all) contract FiatToken: FungibleToken {
 
-    // ------- FiatToken Events -------
+    /// ------- FiatToken Events -------
     
-    // FiatToken.Vault events
+    /// FiatToken.Vault events
 
     access(all) event NewVault(resourceId: UInt64)
     access(all) event DestroyVault(resourceId: UInt64)
 
-    // Minting events
+    /// Minting events
 
     access(all) event MinterCreated(resourceId: UInt64)
     access(all) event Mint(minter: UInt64, amount: UFix64)
     access(all) event Burn(minter: UInt64, amount: UFix64)
 
-    // -------- FiatToken Paths --------
+    /// -------- FiatToken Paths --------
 
     access(all) let VaultStoragePath: StoragePath
     access(all) let VaultBalancePubPath: PublicPath
     access(all) let VaultReceiverPubPath: PublicPath
     access(all) let MinterStoragePath: StoragePath
 
-    // ------- FiatToken States / Variables -------
+    /// ------- FiatToken States / Variables -------
 
     access(all) let name: String
     access(all) var version: String
 
-    // The token total supply
+    /// The total supply of this smart contract
+    /// Note: As this is the bridged version of EVM USDC,
+    /// it only counts bridged tokens in the total supply
+    /// and does not count tokens on the EVM side
     access(all) var totalSupply: UFix64
 
-    // Blocked resources dictionary {resourceId: Block Height}
+    /// Blocked resources dictionary {resourceId: Block Height}
+    /// accounts that were blocked before the Cadence 1.0 upgrade
+    /// will still be blocked
     access(contract) let blocklist: {UInt64: UInt64}
 
-    // -------- ViewResolver Functions for MetadataViews --------
+    /// -------- ViewResolver Functions for MetadataViews --------
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
@@ -56,17 +64,18 @@ access(all) contract FiatToken: FungibleToken {
                     ftVaultData: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
                 )
             case Type<FungibleTokenMetadataViews.FTDisplay>():
+                // Potential TODO: Replace with USDC http file and media type?
                 let media = MetadataViews.Media(
                         file: MetadataViews.HTTPFile(
-                        url: ""
+                        url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
                     ),
-                    mediaType: ""
+                    mediaType: "image/svg+xml"
                 )
                 let medias = MetadataViews.Medias([media])
                 return FungibleTokenMetadataViews.FTDisplay(
                     name: "Bridged Circle USDC",
                     symbol: "USDC",
-                    description: "This is the Flow Bridged version of USDC in Cadence",
+                    description: "This is the Flow Cadence Bridged version of Flow-EVM USDC",
                     externalURL: MetadataViews.ExternalURL("https://www.circle.com/en/usdc"),
                     logos: medias,
                     socials: {
@@ -92,7 +101,7 @@ access(all) contract FiatToken: FungibleToken {
         return nil
     }
 
-    // ------- Old FiatToken Interfaces, kept for backwards compatibility, but all functionality has been removed
+    /// ------- Old FiatToken Interfaces, kept for backwards compatibility, but all functionality has been removed
     access(all) resource interface ResourceId {}
     access(all) resource interface AdminCapReceiver {}
     access(all) resource interface OwnerCapReceiver {}
@@ -100,7 +109,7 @@ access(all) contract FiatToken: FungibleToken {
     access(all) resource interface BlocklisterCapReceiver {}
     access(all) resource interface PauseCapReceiver {}
     
-    // ------- Old FiatToken resource types that needed to be removed
+    /// ------- Old FiatToken resource types that needed to be removed
     #removedType(AdminExecutor)
     #removedType(Admin)
     #removedType(OwnerExecutor)
@@ -114,7 +123,7 @@ access(all) contract FiatToken: FungibleToken {
     #removedType(PauseExecutor)
     #removedType(Pauser)
 
-    // ------- FiatToken Resources -------
+    /// ------- FiatToken Resources -------
 
     access(all) resource Vault:
         ResourceId,
@@ -176,7 +185,6 @@ access(all) contract FiatToken: FungibleToken {
             }
             let vault <- from as! @FiatToken.Vault
             self.balance = self.balance + vault.balance
-            vault.balance = 0.0
             destroy vault
         }
 
@@ -191,10 +199,12 @@ access(all) contract FiatToken: FungibleToken {
 
     access(all) resource MinterResource: FlowEVMBridgeHandlerInterfaces.TokenMinter {
 
+        /// Required function for the bridge to be able to work with the Minter
         access(all) view fun getMintedType(): Type {
             return Type<@FiatToken.Vault>()
         }
 
+        /// Function for the bridge to mint tokens that are bridged from Flow EVM
         access(FlowEVMBridgeHandlerInterfaces.Mint) fun mint(amount: UFix64): @{FungibleToken.Vault} {
             pre {
                 FiatToken.blocklist[self.uuid] == nil: "Minter Blocklisted"
@@ -206,6 +216,7 @@ access(all) contract FiatToken: FungibleToken {
             return <-create Vault(balance: amount)
         }
 
+        /// Function for the bridge to burn tokens that are bridged back to Flow EVM
         access(all) fun burn(vault: @{FungibleToken.Vault}) {
             let toBurn <- vault as! @FiatToken.Vault
             let amount = toBurn.balance
@@ -218,13 +229,13 @@ access(all) contract FiatToken: FungibleToken {
         }
     }
 
-    /// Another contract will be deployed that can call this to
-    /// create the minter resource and send it to the bridge account
+    /// Another contract will be deployed as part of the Crescendo upgrade
+    /// that calls this to create the minter resource and send it to the bridge account
     access(account) fun createMinter(): @MinterResource {
         return <-create MinterResource()
     }
 
-    // ------- FiatToken functions -------
+    /// ------- FiatToken functions -------
 
     access(all) fun createEmptyVault(vaultType: Type): @Vault {
         let r <-create Vault(balance: 0.0)
@@ -232,7 +243,8 @@ access(all) contract FiatToken: FungibleToken {
         return <-r
     }
 
-    // ------- FiatToken Initializer -------
+    /// ------- FiatToken Initializer -------
+    /// Does not run as part of the Crescendo migration, so only used for testing
     init(
         VaultStoragePath: StoragePath,
         VaultBalancePubPath: PublicPath,

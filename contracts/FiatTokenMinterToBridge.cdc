@@ -9,13 +9,14 @@ access(all) contract FiatTokenMinterToBridge {
 
     /// Sends the FiatToken Minter to the Flow/EVM bridge
     /// without giving any account access to the minter
-    /// before it is safely in the bridge
+    /// before it is safely in the decentralized bridge
     access(self) fun sendMinterToBridge(_ bridgeAddress: Address) {
         let minter <- FiatToken.createMinter()
         // borrow a reference to the bridge's configuration admin resource from public Capability
         let bridgeAdmin = getAccount(bridgeAddress).capabilities.borrow<&FlowEVMBridgeConfig.Admin>(
                 FlowEVMBridgeConfig.adminPublicPath
             ) ?? panic("FlowEVMBridgeConfig.Admin could not be referenced from ".concat(bridgeAddress.toString()))
+            
         // sets the FiatToken as the minter resource for all FiatToken bridge requests
         // prior to transferring the Minter, a TokenHandler will be set for FiatToken during the bridge's initial
         // configuration, setting the stage for this minter to be sent.

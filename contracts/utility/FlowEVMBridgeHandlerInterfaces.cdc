@@ -135,29 +135,29 @@ access(all) contract FlowEVMBridgeHandlerInterfaces {
     /// and called be the bridge contract for bridging operations on the Handler's target Type and EVM contract.
     ///
     access(all) resource interface TokenHandler : HandlerAdmin {
-        /// Fulfills a request to bridge tokens from the Cadence side to the EVM side
-        access(account) fun fulfillTokensToEVM(
-            tokens: @{FungibleToken.Vault},
-            to: EVM.EVMAddress
-        ) {
-            pre {
-                self.isEnabled(): "Handler is not yet enabled"
-                tokens.getType() == self.getTargetType(): "Invalid Vault type"
-            }
-        }
-        /// Fulfills a request to bridge tokens from the EVM side to the Cadence side
-        access(account) fun fulfillTokensFromEVM(
-            owner: EVM.EVMAddress,
-            type: Type,
-            amount: UInt256,
-            protectedTransferCall: fun (): EVM.Result
-        ): @{FungibleToken.Vault} {
-            pre {
-                self.isEnabled(): "Handler is not yet enabled"
-            }
-            post {
-                result.getType() == self.getTargetType(): "Invalid Vault type returned"
-            }
-        }
+        // /// Fulfills a request to bridge tokens from the Cadence side to the EVM side
+        // access(account) fun fulfillTokensToEVM(
+        //     tokens: @{FungibleToken.Vault},
+        //     to: EVM.EVMAddress
+        // ) {
+        //     pre {
+        //         self.isEnabled(): "Handler is not yet enabled"
+        //         tokens.getType() == self.getTargetType(): "Invalid Vault type"
+        //     }
+        // }
+        // /// Fulfills a request to bridge tokens from the EVM side to the Cadence side
+        // access(account) fun fulfillTokensFromEVM(
+        //     owner: EVM.EVMAddress,
+        //     type: Type,
+        //     amount: UInt256,
+        //     protectedTransferCall: fun (): EVM.Result
+        // ): @{FungibleToken.Vault} {
+        //     pre {
+        //         self.isEnabled(): "Handler is not yet enabled"
+        //     }
+        //     post {
+        //         result.getType() == self.getTargetType(): "Invalid Vault type returned"
+        //     }
+        // }
     }
 }

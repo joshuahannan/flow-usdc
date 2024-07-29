@@ -34,6 +34,12 @@ fun setup() {
     )
 
     deployWithArgs(
+        "FlowEVMBridgeHandlers",
+        "../contracts/utility/FlowEVMBridgeHandlers.cdc",
+        args: []
+    )
+
+    deployWithArgs(
         "FiatToken",
         "../contracts/FiatToken.cdc",
         args: [
@@ -47,14 +53,6 @@ fun setup() {
             version,
             initTotalSupply
             //initPaused
-        ]
-    )
-
-    deployWithArgs(
-        "FiatTokenMinterToBridge",
-        "../contracts/FiatTokenMinterToBridge.cdc",
-        args: [
-            admin.address
         ]
     )
 }
@@ -170,4 +168,30 @@ fun testVaultTypes() {
         Type<FungibleTokenMetadataViews.TotalSupply>()
     ]
     Test.assertEqual(expectedViews, supportedViews)
+}
+
+// Not able to be fully tested until the bridge config is available on emulator
+access(all)
+fun testTransferMinterToBridge() {
+    // var txResult = executeTransaction(
+    //     "transactions/create_cadence_native_token_handler.cdc",
+    //     ["A.0000000000000007.FiatToken.Vault", "A.0000000000000007.FiatToken.MinterResource"],
+    //     admin
+    // )
+    // Test.expect(txResult, Test.beSucceeded())
+
+    // txResult = executeTransaction(
+    //     "transactions/enable_token_handler.cdc",
+    //     ["A.0000000000000007.FiatToken.Vault"],
+    //     admin
+    // )
+    // Test.expect(txResult, Test.beSucceeded())
+
+    // deployWithArgs(
+    //     "FiatTokenMinterToBridge",
+    //     "../contracts/FiatTokenMinterToBridge.cdc",
+    //     args: [
+    //         admin.address
+    //     ]
+    // )
 }
